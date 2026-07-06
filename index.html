@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vidie Dwi Saputra | 3D Portfolio</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        body.light-mode {
+            background: #f0f2f5;
+            color: #1a1a2e;
+        }
+        body.light-mode .text-white\/60 { color: rgba(30,30,60,0.65); }
+        body.light-mode .text-white\/70 { color: rgba(30,30,60,0.75); }
+        body.light-mode .text-white\/80 { color: rgba(30,30,60,0.85); }
+        body.light-mode .text-white\/30 { color: rgba(30,30,60,0.35); }
+        body.light-mode .text-white\/50 { color: rgba(30,30,60,0.55); }
+        body.light-mode .text-white { color: #1a1a2e; }
+        body.light-mode .border-white\/20 { border-color: rgba(0,0,0,0.15); }
+        body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.06); }
+        body.light-mode .hover\:bg-white\/10:hover { background: rgba(0,0,0,0.06); }
+        body.light-mode .bg-white\/10 { background: rgba(0,0,0,0.06); }
+        body.light-mode .text-indigo-400 { color: #6366f1; }
+        body.light-mode .bg-indigo-500\/20 { background: rgba(99,102,241,0.12); }
+        body.light-mode .bg-pink-500\/20 { background: rgba(236,72,153,0.12); }
+        body.light-mode .bg-cyan-500\/20 { background: rgba(6,182,212,0.12); }
+        body.light-mode footer { border-color: rgba(0,0,0,0.06); }
+        body.light-mode #toggle-mode { color: rgba(30,30,60,0.6); }
+        body.light-mode #toggle-mode:hover { color: #1a1a2e; }
+        body.light-mode #menu-btn { color: rgba(30,30,60,0.8); }
+        body.light-mode .skill-bar { background: rgba(0,0,0,0.07); }
+
+        /* ── 3D Background Canvas ── */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ── Glassmorphism ── */
+        .glass {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+        }
+        .glass-light {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            border-radius: 20px;
+        }
+
+        /* ── Section Spacing ── */
+        section { position: relative; z-index: 1; }
+
+        /* ── 3D Card Tilt ── */
+        .tilt-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.1s ease;
+        }
+        .tilt-card .tilt-content {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+        .tilt-card .tilt-float {
+            transform: translateZ(40px);
+        }
+
+        /* ── Float Animations ── */
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-18px); }
+        }
+        @keyframes floatX {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(-14px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(99,102,241,0.3); }
+            50% { box-shadow: 0 0 60px rgba(99,102,241,0.6); }
+        }
+        .anim-float-y { animation: floatY 5s ease-in-out infinite; }
+        .anim-float-x { animation: floatX 7s ease-in-out infinite; }
+        .anim-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+
+        /* ── Orb ── */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .orb-1 { width: 400px; height: 400px; background: #6366f1; top: -100px; left: -100px; animation: floatY 8s ease-in-out infinite; }
+        .orb-2 { width: 350px; height: 350px; background: #ec4899; bottom: -80px; right: -80px; animation: floatX 9s ease-in-out infinite; }
+        .orb-3 { width: 250px; height: 250px; background: #06b6d4; top: 50%; left: 50%; animation: floatY 6s ease-in-out infinite reverse; }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            transition: all 0.4s ease;
+            padding: 1rem 2rem;
+        }
+        .navbar.scrolled {
+            background: rgba(10, 10, 15, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0.6rem 2rem;
+        }
+        body.light-mode .navbar.scrolled {
+            background: rgba(240, 242, 245, 0.80);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+        /* ── Hero Image ── */
+        .hero-img-wrapper {
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        .hero-img-wrapper img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.15);
+            position: relative;
+            z-index: 2;
+        }
+        .hero-img-wrapper .ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: conic-gradient(from 0deg, #6366f1, #ec4899, #06b6d4, #6366f1) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: spin 6s linear infinite;
+            z-index: 1;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Project Cards ── */
+        .project-card {
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        body.light-mode .project-card {
+            background: rgba(255,255,255,0.70);
+            border-color: rgba(0,0,0,0.06);
+        }
+        .project-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(99,102,241,0.3);
+            box-shadow: 0 20px 60px rgba(99,102,241,0.15);
+        }
+
+        /* ── Skill Bar ── */
+        .skill-bar {
+            height: 8px;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            width: 0%;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* ── Reveal on Scroll ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-left.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-right.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-scale.revealed {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ── Nav Links ── */
+        .nav-link {
+            position: relative;
+            color: rgba(255,255,255,0.65);
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .nav-link:hover { color: #fff; }
+        .nav-link:hover::after { width: 100%; }
+        body.light-mode .nav-link { color: rgba(0,0,0,0.55); }
+        body.light-mode .nav-link:hover { color: #1a1a2e; }
+
+        /* ── Form ── */
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+        body.light-mode .form-input {
+            background: rgba(255,255,255,0.70);
+            border-color: rgba(0,0,0,0.10);
+            color: #1a1a2e;
+        }
+        .form-input::placeholder { color: rgba(255,255,255,0.3); }
+        body.light-mode .form-input::placeholder { color: rgba(0,0,0,0.3); }
+
+        /* ── Social Icons ── */
+        .social-icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
+        }
+        .social-icon:hover {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: #fff;
+            transform: translateY(-4px) scale(1.1);
+            border-color: transparent;
+        }
+        body.light-mode .social-icon {
+            background: rgba(0,0,0,0.04);
+            border-color: rgba(0,0,0,0.08);
+            color: rgba(0,0,0,0.5);
+        }
+        body.light-mode .social-icon:hover {
+            color: #fff;
+        }
+
+        /* ── Gradient Text ── */
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #ec4899, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── Button ── */
+        .btn-primary {
+            padding: 14px 36px;
+            border-radius: 99px;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(99,102,241,0.35);
+        }
+
+        /* ── Light mode overrides ── */
+        body.light-mode .glass { background: rgba(255,255,255,0.55); border-color: rgba(255,255,255,0.30); }
+        body.light-mode .hero-img-wrapper img { border-color: rgba(0,0,0,0.10); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .navbar { padding: 0.8rem 1rem; }
+            .hero-img-wrapper { width: 160px; height: 160px; }
+            .orb-1, .orb-2, .orb-3 { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ 3D Background ═══ -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ═══ Ambient Orbs ═══ -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- ═══ NAVBAR ═══ -->
+    <nav id="navbar" class="navbar flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-bold gradient-text">VDS</span>
+        </div>
+        <div class="hidden md:flex items-center gap-8">
+            <a href="#home" class="nav-link">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#skills" class="nav-link">Skills</a>
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="toggle-mode" class="text-white/60 hover:text-white transition-colors text-xl">
+                <i class="fas fa-moon" id="mode-icon"></i>
+            </button>
+            <button id="menu-btn" class="md:hidden text-white/80 text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══ Mobile Menu ═══ -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-white text-3xl"><i class="fas fa-times"></i></button>
+        <div class="flex flex-col items-center gap-8 text-2xl">
+            <a href="#home" class="nav-link text-3xl close-menu-link">Home</a>
+            <a href="#about" class="nav-link text-3xl close-menu-link">About</a>
+            <a href="#skills" class="nav-link text-3xl close-menu-link">Skills</a>
+            <a href="#projects" class="nav-link text-3xl close-menu-link">Projects</a>
+            <a href="#contact" class="nav-link text-3xl close-menu-link">Contact</a>
+        </div>
+    </div>
+
+    <!-- ═══ HERO ═══ -->
+    <section id="home" class="min-h-screen flex items-center justify-center px-4 pt-20">
+        <div class="text-center max-w-3xl">
+            <div class="flex justify-center mb-8">
+                <div class="hero-img-wrapper anim-float-y">
+                    <div class="ring"></div>
+                    <img src="pictures/pc3.jpg" alt="Vidie Dwi Saputra" />
+                </div>
+            </div>
+            <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm mb-4 reveal">Web Developer &amp; Designer</p>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 reveal" style="transition-delay:0.1s">
+                Hi, I'm <span class="gradient-text">Vidie</span>
+            </h1>
+            <p class="text-lg md:text-xl text-white/60 max-w-xl mx-auto mb-10 reveal" style="transition-delay:0.2s">
+                Crafting digital experiences with clean code &amp; creative design. Passionate about building things that live on the web.
+            </p>
+            <div class="flex items-center justify-center gap-4 reveal" style="transition-delay:0.3s">
+                <a href="#projects" class="btn-primary">
+                    See My Work <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#contact" class="px-8 py-3 rounded-full border border-white/20 text-white/80 hover:bg-white/10 transition-all font-medium">
+                    Contact Me
+                </a>
+            </div>
+            <div class="flex items-center justify-center gap-4 mt-12 reveal" style="transition-delay:0.4s">
+                <a href="https://instagram.com/itsme_wafertango" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://github.com/vidiaja" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://wa.link/c4py00" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ABOUT ═══ -->
+    <section id="about" class="py-24 px-4">
+        <div class="max-w-5xl mx-auto">
+            <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm text-center mb-2 reveal">About</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 reveal gradient-text">Tentang Saya</h2>
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="reveal-left">
+                    <div class="glass p-8 md:p-10 rounded-2xl">
+                        <p class="text-lg leading-relaxed text-white/70">
+                            Halo! Saya <strong class="text-white">Vidie Dwi Saputra</strong>, seorang pengembang web yang bersemangat dalam menciptakan desain yang elegan dan fungsional. 
+                            Saya memiliki pengalaman dalam HTML, CSS, JavaScript, dan berbagai framework modern.
+                        </p>
+                        <p class="text-lg leading-relaxed text-white/70 mt-6">
+                            Saya percaya bahwa kode yang baik adalah seni. Setiap baris kode yang saya tulis adalah kanvas untuk menciptakan pengalaman digital yang tak terlupakan.
+                        </p>
+                    </div>
+                </div>
+                <div class="reveal-right">
+                    <div class="glass p-8 md:p-10 rounded-2xl space-y-5">
+                        <div>
+                            <p class="text-white/50 text-sm mb-1">Nama</p>
+                            <p class="text-white font-semibold text-lg">Vidie Dwi Saputra</p>
+                        </div>
+                        <div>
+                            <p class="text-white/50 text-sm mb-1">Lokasi</p>
+                            <p class="text-white font-semibold text-lg">Indonesia</p>
+                        </div>
+                        <div>
+                            <p class="text-white/50 text-sm mb-1">Fokus</p>
+                            <p class="text-white font-semibold text-lg">Web Development &amp; Design</p>
+                        </div>
+                        <div>
+                            <p class="text-white/50 text-sm mb-1">Status</p>
+                            <p class="text-white font-semibold text-lg">Mahasiswa / Available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SKILLS ═══ -->
+    <section id="skills" class="py-24 px-4">
+        <div class="max-w-5xl mx-auto">
+            <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm text-center mb-2 reveal">Skills</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 reveal gradient-text">Keahlian Saya</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="reveal-left">
+                    <div class="glass p-8 rounded-2xl">
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">HTML &amp; CSS</span>
+                                <span class="text-indigo-400 skill-pct">90%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">JavaScript</span>
+                                <span class="text-indigo-400 skill-pct">65%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">PHP</span>
+                                <span class="text-indigo-400 skill-pct">65%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Python</span>
+                                <span class="text-indigo-400 skill-pct">45%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal-right">
+                    <div class="glass p-8 rounded-2xl">
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Tailwind CSS</span>
+                                <span class="text-indigo-400 skill-pct">30%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">MySQL</span>
+                                <span class="text-indigo-400 skill-pct">50%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div class="mb-7">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Next.js</span>
+                                <span class="text-indigo-400 skill-pct">50%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">UI/UX Design</span>
+                                <span class="text-indigo-400 skill-pct">50%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-bar-fill"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROJECTS ═══ -->
+    <section id="projects" class="py-24 px-4">
+        <div class="max-w-6xl mx-auto">
+            <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm text-center mb-2 reveal">Projects</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 reveal gradient-text">Proyek Saya</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <div class="project-card tilt-card reveal-scale" style="transition-delay:0.1s">
+                    <div class="tilt-content p-8">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-2xl mb-5 tilt-float">
+                            <i class="fas fa-calculator text-indigo-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 tilt-float">Kalkulator</h3>
+                        <p class="text-white/60 leading-relaxed tilt-float" style="transform:translateZ(20px)">
+                            Project pertama saya membuat kalkulator interaktif menggunakan HTML, CSS, dan JavaScript.
+                        </p>
+                        <div class="mt-6 flex gap-2 tilt-float" style="transform:translateZ(30px)">
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">HTML</span>
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">CSS</span>
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">JS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card tilt-card reveal-scale" style="transition-delay:0.2s">
+                    <div class="tilt-content p-8">
+                        <div class="w-14 h-14 rounded-2xl bg-pink-500/20 flex items-center justify-center text-2xl mb-5 tilt-float">
+                            <i class="fas fa-university text-pink-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 tilt-float">ATM Sederhana</h3>
+                        <p class="text-white/60 leading-relaxed tilt-float" style="transform:translateZ(20px)">
+                            ATM sederhana berbasis Python yang berjalan dengan fungsionalitas penuh di terminal.
+                        </p>
+                        <div class="mt-6 flex gap-2 tilt-float" style="transform:translateZ(30px)">
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">Python</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card tilt-card reveal-scale" style="transition-delay:0.3s">
+                    <div class="tilt-content p-8">
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-2xl mb-5 tilt-float">
+                            <i class="fas fa-tshirt text-cyan-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 tilt-float">Aplikasi Laundry</h3>
+                        <p class="text-white/60 leading-relaxed tilt-float" style="transform:translateZ(20px)">
+                            Aplikasi Laundry berbasis PHP &amp; MySQL dengan banyak fitur lengkap untuk manajemen bisnis laundry.
+                        </p>
+                        <div class="mt-6 flex gap-2 tilt-float" style="transform:translateZ(30px)">
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">PHP</span>
+                            <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/60">MySQL</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ CONTACT ═══ -->
+    <section id="contact" class="py-24 px-4">
+        <div class="max-w-3xl mx-auto">
+            <p class="text-indigo-400 font-semibold tracking-widest uppercase text-sm text-center mb-2 reveal">Contact</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 reveal gradient-text">Hubungi Saya</h2>
+            <div class="glass p-8 md:p-12 rounded-2xl reveal">
+                <form id="contact-form" action="https://formspree.io/f/myzwvwyl" method="POST">
+                    <div class="grid md:grid-cols-2 gap-5 mb-5">
+                        <input type="text" name="name" placeholder="Nama Anda" required class="form-input" />
+                        <input type="email" name="email" placeholder="Email Anda" required class="form-input" />
+                    </div>
+                    <textarea name="message" rows="5" placeholder="Pesan Anda..." required class="form-input mb-6"></textarea>
+                    <button type="submit" class="btn-primary w-full justify-center">
+                        <i class="fas fa-paper-plane"></i> Kirim Pesan
+                    </button>
+                </form>
+            </div>
+            <div class="flex items-center justify-center gap-5 mt-10 reveal">
+                <a href="https://instagram.com/itsme_wafertango" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://github.com/vidiaja" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://wa.link/c4py00" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="py-8 border-t border-white/5 text-center text-white/30 text-sm">
+        &copy; 2025 <span class="gradient-text font-semibold">Vidie Dwi Saputra</span>. All rights reserved.
+    </footer>
+
+    <!-- ═══ Three.js ═══ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+    <script>
+        // ─── 3D Particle Background ───
+        (function() {
+            const canvas = document.getElementById('bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const count = 2000;
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+
+            const color1 = new THREE.Color('#6366f1');
+            const color2 = new THREE.Color('#ec4899');
+            const color3 = new THREE.Color('#06b6d4');
+
+            for (let i = 0; i < count; i++) {
+                positions[i*3] = (Math.random() - 0.5) * 30;
+                positions[i*3+1] = (Math.random() - 0.5) * 30;
+                positions[i*3+2] = (Math.random() - 0.5) * 30;
+                const c = Math.random();
+                const col = c < 0.33 ? color1 : c < 0.66 ? color2 : color3;
+                colors[i*3] = col.r;
+                colors[i*3+1] = col.g;
+                colors[i*3+2] = col.b;
+                sizes[i] = Math.random() * 3 + 1;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.06,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                sizeAttenuation: true,
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            camera.position.z = 12;
+
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0003;
+                particles.rotation.x += 0.0001;
+                camera.position.x += (mouseX - camera.position.x) * 0.02;
+                camera.position.y += (-mouseY - camera.position.y) * 0.02;
+                camera.lookAt(0, 0, 0);
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Toggle particles color for light mode
+            window.__toggleParticles = function(isLight) {
+                material.opacity = isLight ? 0.3 : 0.8;
+            };
+        })();
+
+        // ─── Navbar Scroll ───
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        // ─── Mobile Menu ───
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.remove('hidden');
+        });
+        document.getElementById('close-menu').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.add('hidden');
+        });
+        document.querySelectorAll('.close-menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // ─── Dark / Light Mode ───
+        let isLight = false;
+        const modeIcon = document.getElementById('mode-icon');
+        document.getElementById('toggle-mode').addEventListener('click', () => {
+            isLight = !isLight;
+            document.body.classList.toggle('light-mode', isLight);
+            modeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            if (window.__toggleParticles) window.__toggleParticles(isLight);
+        });
+
+        // ─── 3D Tilt Effect on Cards ───
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / centerY * -8;
+                const rotateY = (x - centerX) / centerX * 8;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            });
+        });
+
+        // ─── Reveal on Scroll (Intersection Observer) ───
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.10 });
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // ─── Skill Bar Animation ───
+        const skillObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const fill = entry.target;
+                    const pct = fill.closest('.skill-bar').previousElementSibling.querySelector('.skill-pct');
+                    const width = parseInt(pct.textContent);
+                    fill.style.width = width + '%';
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.skill-bar-fill').forEach(el => {
+            skillObserver.observe(el);
+        });
+
+        // ─── Contact Form ───
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            btn.disabled = true;
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'Accept': 'application/json' }
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Terkirim!';
+                    this.reset();
+                } else {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal';
+                }
+            }).catch(() => {
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+            }).finally(() => {
+                setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
