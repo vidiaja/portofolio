@@ -301,7 +301,18 @@ body.light-mode .glass { background: rgba(255,255,255,0.55); border-color: rgba(
 body.light-mode .hero-img-wrapper img { border-color: rgba(0,0,0,0.10); }
 
 @media (max-width: 768px) {
-    .navbar { padding: 0.8rem 1rem; }
-    .hero-img-wrapper { width: 160px; height: 160px; }
+    .navbar { padding: 0.7rem 1rem; }
+    .navbar.scrolled { padding: 0.5rem 1rem; }
+    .hero-img-wrapper { width: 140px; height: 140px; }
     .orb-1, .orb-2, .orb-3 { display: none; }
+    section { padding-top: 4rem !important; padding-bottom: 4rem !important; }
+    .glass { padding: 1.5rem !important; }
+    .btn-primary { padding: 12px 28px; font-size: 0.9rem; }
+    .social-icon { width: 42px; height: 42px; font-size: 1rem; }
+    .project-card .tilt-content { padding: 1.5rem !important; }
+    .gap-10 { gap: 1.5rem; }
+    h2 { font-size: 2.25rem !important; }
+    .form-input { padding: 12px 16px; font-size: 0.95rem; }
+    .flex-wrap.gap-8 { gap: 1rem; }
+    footer { padding: 1.5rem 1rem; font-size: 0.8rem; }
 }
