@@ -24,6 +24,7 @@ body.light-mode .text-indigo-400 { color: #6366f1; }
 body.light-mode .bg-indigo-500\/20 { background: rgba(99,102,241,0.12); }
 body.light-mode .bg-pink-500\/20 { background: rgba(236,72,153,0.12); }
 body.light-mode .bg-cyan-500\/20 { background: rgba(6,182,212,0.12); }
+body.light-mode .bg-amber-500\/20 { background: rgba(245,158,11,0.12); }
 body.light-mode footer { border-color: rgba(0,0,0,0.06); }
 body.light-mode #toggle-mode { color: rgba(30,30,60,0.6); }
 body.light-mode #toggle-mode:hover { color: #1a1a2e; }
