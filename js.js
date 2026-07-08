@@ -75,10 +75,72 @@
     };
 })();
 
+// ─── Typing Effect ───
+(function() {
+    const el = document.getElementById('typed-text');
+    const cursor = document.getElementById('cursor');
+    if (!el) return;
+    const words = ['Web Developer', 'Designer', 'Freelancer', 'Next.js Developer'];
+    let wordIdx = 0, charIdx = 0, isDeleting = false;
+
+    function type() {
+        const current = words[wordIdx];
+        if (isDeleting) {
+            el.textContent = current.substring(0, charIdx--);
+            if (charIdx < 0) {
+                isDeleting = false;
+                wordIdx = (wordIdx + 1) % words.length;
+                setTimeout(type, 400);
+                return;
+            }
+            setTimeout(type, 40);
+        } else {
+            el.textContent = current.substring(0, charIdx++);
+            if (charIdx > current.length) {
+                isDeleting = true;
+                setTimeout(type, 1500);
+                return;
+            }
+            setTimeout(type, 80);
+        }
+    }
+    type();
+})();
+
 // ─── Navbar Scroll ───
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
     navbar?.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ─── Active Nav Highlight ───
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(link => link.classList.remove('active'));
+            const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+            active?.classList.add('active');
+        }
+    });
+}, { threshold: 0.3, rootMargin: '-60px 0px 0px 0px' });
+sections.forEach(s => navObserver.observe(s));
+
+// ─── Back to Top ───
+const backBtn = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+    if (!backBtn) return;
+    if (window.scrollY > 400) {
+        backBtn.classList.remove('opacity-0', 'invisible', 'translate-y-4');
+        backBtn.classList.add('opacity-100', 'visible', 'translate-y-0');
+    } else {
+        backBtn.classList.add('opacity-0', 'invisible', 'translate-y-4');
+        backBtn.classList.remove('opacity-100', 'visible', 'translate-y-0');
+    }
+});
+backBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 // ─── Mobile Menu ───

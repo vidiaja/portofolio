@@ -17,6 +17,7 @@ body.light-mode .text-white\/30 { color: rgba(30,30,60,0.35); }
 body.light-mode .text-white\/50 { color: rgba(30,30,60,0.55); }
 body.light-mode .text-white { color: #1a1a2e; }
 body.light-mode .border-white\/20 { border-color: rgba(0,0,0,0.15); }
+body.light-mode .border-white\/10 { border-color: rgba(0,0,0,0.10); }
 body.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.06); }
 body.light-mode .hover\:bg-white\/10:hover { background: rgba(0,0,0,0.06); }
 body.light-mode .bg-white\/10 { background: rgba(0,0,0,0.06); }
@@ -218,8 +219,18 @@ body.light-mode .project-card {
 }
 .nav-link:hover { color: #fff; }
 .nav-link:hover::after { width: 100%; }
+.nav-link.active { color: #fff; }
+.nav-link.active::after { width: 100%; }
 body.light-mode .nav-link { color: rgba(0,0,0,0.55); }
 body.light-mode .nav-link:hover { color: #1a1a2e; }
+body.light-mode .nav-link.active { color: #1a1a2e; }
+
+#cursor {
+    animation: blink 0.8s step-end infinite;
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}
 
 .form-input {
     width: 100%;
